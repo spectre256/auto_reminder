@@ -34,7 +34,7 @@
         src = ./.;
         format = "pyproject";
         preBuild = "cp ${pyproject} pyproject.toml";
-        buildInputs = [ setuptools moodlepy ];
+        buildInputs = [ setuptools requests moodlepy ];
       };
 
       formatter.${system} = pkgs.nixpkgs-fmt;
@@ -42,6 +42,7 @@
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
           (pkgs.python3.withPackages (py-pkgs: with py-pkgs; [
+            requests
             moodlepy
             jedi-language-server
           ]))

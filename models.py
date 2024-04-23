@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from typing import List
 from datetime import datetime, timedelta
@@ -9,8 +9,11 @@ class Quiz:
     name: str
     due_date: datetime | None
 
+    def __str__(self):
+        return "{}, due {:%m/%d %I:%M %p}".format(self.name, self.due_date)
+
     @classmethod
-    def from(cls, quiz: dict):
+    def from_api(cls, quiz: dict):
         id = quiz["id"]
         name = quiz["name"]
         due_date = datetime.utcfromtimestamp(quiz["timeclose"]) if quiz["timeclose"] != 0 else None
@@ -18,19 +21,21 @@ class Quiz:
 
     def due_before(self, time: timedelta) -> bool:
         epoch = datetime.utcfromtimestamp(0)
-        return self.due_date != epoch and (self.due_date > datetime.utcnow() + time or self.due_date < datetime.utcnow())
+        return self.due_date != epoch and self.due_date < datetime.utcnow() + time and self.due_date >= datetime.utcnow()
 
 
 @dataclass
 class Student:
     id: int
-    fullname: str
+    name: str
     email: str
-    missing: List[Quiz] = []
+    missing: List[Quiz] = field(default_factory=List[Quiz])
 
     @classmethod
-    def from(cls, student: dict):
+    def from_api(cls, student: dict):
         id = student["id"]
+        name = student["fullname"]
+        email = student["email"]
         return cls()
 
 class StudentFinder(ABC):
@@ -40,7 +45,7 @@ class StudentFinder(ABC):
     @abstractmethod
     def __init__(self, config):
         self.config = config
-        self.threshold = timedelta(days=config["TIME_THRESHOLD"])
+        self.threshold = timedelta(days=int(config["threshold"]))
 
     @abstractmethod
     def get_quizzes(self) -> List[Quiz]:
