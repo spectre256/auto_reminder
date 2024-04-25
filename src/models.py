@@ -36,7 +36,7 @@ class Student:
         id = student["id"]
         name = student["fullname"]
         email = student["email"]
-        return cls()
+        return cls(id, name, email)
 
 class StudentFinder(ABC):
     config: dict

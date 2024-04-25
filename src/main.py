@@ -20,9 +20,9 @@ class App:
         for student in students:
             self.emailer.send(template, student)
 
-    # def parse_args(self) -> argparse.NameSpace:
-    #     parser = argparse.ArgumentParser()
-    #     parser.add_argument()
+    def parse_args(self) -> argparse.NameSpace:
+        parser = argparse.ArgumentParser()
+        parser.add_argument()
 
 def main():
     App("config.json").run()

@@ -20,7 +20,7 @@ class Emailer:
     def compose(self, template: Template, student: Student) -> EmailMessage:
         msg = EmailMessage()
         msg["Subject"] = config["subject"]
-        msg["To"] = student.email
+        msg["To"] = student.email if not config["test"] else self.config["email_address"]
         msg["From"] = self.config["email_address"]
         missing = "\n".join(map("    - {}".format, student.missing))
         msg.set_content(template.substitute(mapping=vars(student), missing=missing))

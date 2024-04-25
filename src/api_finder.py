@@ -3,7 +3,6 @@ from typing import List
 from datetime import datetime, timedelta
 from functools import partial
 from moodle import Moodle
-import os
 
 class ApiFinder(StudentFinder):
     threshold: timedelta
