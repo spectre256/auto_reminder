@@ -10,7 +10,7 @@ class Emailer:
 
     def __init__(self, config):
         self.config = config
-        self.smtp = SMTP(config["email_host"], config["email_port"])
+        self.smtp = SMTP(config["email_host"], int(config["email_port"]))
         context = ssl.create_default_context()
         self.smtp.starttls(context=context)
 
