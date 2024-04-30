@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 from datetime import datetime, timedelta
+from typing import Callable
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Quiz:
     id: int | None
     name: str
@@ -41,17 +43,18 @@ class Student:
 
     @classmethod
     def from_api(cls, student: dict):
-        id = student["id"]
+        id = int(student["id"])
         name = student["fullname"]
         email = student["email"]
         return cls(id, name, email)
 
     @classmethod
-    def from_file(cls, student: dict):
-        id = student["ID number"]
+    def from_file(cls, student: dict, quizzes: Callable[[], Iterable[Quiz]]):
+        id = int(student["ID number"])
         name = student["First name"] + " " + student["Last name"]
         email = student["Email address"]
-        return cls(id, name, email)
+        missing = [quiz for quiz in quizzes() if student[quiz.name] == "-"]
+        return cls(id, name, email, missing)
 
 class StudentFinder(ABC):
     config: dict
@@ -63,24 +66,24 @@ class StudentFinder(ABC):
         self.threshold = timedelta(days=int(config["threshold"]))
 
     @abstractmethod
-    def get_quizzes(self) -> list[Quiz]:
+    def get_quizzes(self) -> Iterable[Quiz]:
         pass
 
     @abstractmethod
-    def get_students(self) -> list[Student]:
+    def get_students(self) -> Iterable[Student]:
         pass
 
     @abstractmethod
     def is_missing(self, student: Student, quiz: Quiz) -> bool:
         pass
 
-    def get_missing(self) -> list[Student]:
-        students = get_students()
-        quizzes = get_quizzes()
+    def get_missing(self) -> Iterable[Student]:
+        students = self.get_students()
+        quizzes = self.get_quizzes()
 
         for student in students:
             for quiz in quizzes:
-                if is_missing(student, quiz):
+                if self.is_missing(student, quiz):
                     student.missing.append(quiz)
 
         return students

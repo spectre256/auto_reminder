@@ -1,18 +1,16 @@
-import ssl
-from smtplib import SMTP
+from smtplib import SMTP_SSL
 from email.message import EmailMessage
 from string import Template
 from models import Student
 
 class Emailer:
     config: dict
-    smtp: SMTP
+    smtp: SMTP_SSL
 
     def __init__(self, config):
         self.config = config
-        self.smtp = SMTP(config["email_host"], int(config["email_port"]))
-        context = ssl.create_default_context()
-        self.smtp.starttls(context=context)
+        self.smtp = SMTP_SSL(config["email_host"], int(config["email_port"]))
+        self.smtp.login(config["email_address"], config["email_password"])
 
     def __del__(self):
         self.smtp.quit()
