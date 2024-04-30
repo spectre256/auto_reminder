@@ -13,7 +13,6 @@ import asyncio
 class App:
     config: dict
     student_finder: StudentFinder
-    emailer: Emailer
 
     def __init__(self):
         args = App.parse_args(sys.argv[1:]) # The [1:] skips the first argument which is the filename
@@ -40,7 +39,7 @@ class App:
 
         group = parser.add_mutually_exclusive_group()
         group.add_argument("-a", "--api", action="store_true", help="Get students through the Moodle api")
-        group.add_argument("-m", "--manual", type=argparse.FileType("r", encoding="UTF-8"), help="Get students from the specified grades file exported from Moodle")
+        group.add_argument("-m", "--manual", type=argparse.FileType("r", encoding="UTF-8"), help="Get students from the specified grades CSV file exported from Moodle")
 
         return vars(parser.parse_args(args))
 

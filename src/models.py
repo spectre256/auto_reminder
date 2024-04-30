@@ -7,6 +7,10 @@ from typing import Callable
 
 @dataclass(slots=True, frozen=True)
 class Quiz:
+    """
+    A Moodle quiz. Holds its information and provides some nice formatting and
+    a way to check its due date
+    """
     id: int | None
     name: str
     due_date: datetime | None
@@ -19,6 +23,9 @@ class Quiz:
 
     @classmethod
     def from_api(cls, quiz: dict):
+        """
+        Creates a quiz from the result of a Moodle API call
+        """
         id = quiz["id"]
         name = quiz["name"]
         due_date = datetime.utcfromtimestamp(quiz["timeclose"]) if quiz["timeclose"] != 0 else None
@@ -26,9 +33,18 @@ class Quiz:
 
     @classmethod
     def from_file(cls, name: str):
+        """
+        Creates a quiz from a name obtained in a grades CSV file
+        """
         return cls(None, name, None)
 
     def due_before(self, time: timedelta) -> bool:
+        """
+        Checks whether the quiz is due within the given timeframe
+
+        :param time: The timeframe to check against
+        :return: Whether or not the quiz is due before then
+        """
         if self.due_date is None:
             return True # If we don't know the due date, don't filter it out
         epoch = datetime.utcfromtimestamp(0)
@@ -37,13 +53,19 @@ class Quiz:
 
 @dataclass(slots=True)
 class Student:
+    """
+    A student. Holds a list of quizzes that the student has not completed
+    """
     id: int
     name: str
     email: str
-    missing: list[Quiz] = field(default_factory=list[Quiz])
+    missing: list[Quiz] = field(default_factory=list[Quiz]) # TODO: Replace list with set?
 
     @classmethod
     def from_api(cls, student: dict):
+        """
+        Creates a student from the result of a Moodle API call
+        """
         id = int(student["id"])
         name = student["fullname"]
         email = student["email"]
@@ -51,6 +73,9 @@ class Student:
 
     @classmethod
     def from_file(cls, student: dict, quizzes: Callable[[], Iterable[Quiz]]):
+        """
+        Creates a student from a row in a grades CSV file
+        """
         id = int(student["ID number"])
         name = student["First name"] + " " + student["Last name"]
         email = student["Email address"]
@@ -59,6 +84,9 @@ class Student:
 
 
 class StudentFinder(ABC):
+    """
+    Finds students with missing assignments
+    """
     config: dict
     threshold: timedelta
 
@@ -69,18 +97,41 @@ class StudentFinder(ABC):
 
     @abstractmethod
     def get_quizzes(self) -> Iterable[Quiz]:
+        """
+        Gets all quizzes in a course
+
+        :return: The quizzes
+        """
         pass
 
     @abstractmethod
     def get_students(self) -> Iterable[Student]:
+        """
+        Gets all students within a course
+
+        :return: The students
+        """
         pass
 
     @abstractmethod
     def is_missing(self, student: Student, quiz: Quiz) -> bool:
+        """
+        Determines whether or not a student is missing a quiz
+
+        :param student: The student
+        :param quiz: The quiz to check for
+        :return: Whether or not the student is missing the quiz
+        """
         pass
 
     @abstractmethod
     def get_missing(self) -> Iterable[Student]:
+        """
+        Gets all students with missing assignments
+
+        :return: The students
+        """
+        # This is just a default implementation; it won't fit all use cases
         students = self.get_students()
         quizzes = self.get_quizzes()
 

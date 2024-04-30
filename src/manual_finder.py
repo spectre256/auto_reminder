@@ -4,6 +4,10 @@ from functools import partial
 import csv
 
 class ManualFinder(StudentFinder):
+    """
+    Implementation of StudentFinder that gets students from a
+    grades CSV file exported from Moodle
+    """
     reader: csv.DictReader
 
     def __init__(self, config: dict, file):

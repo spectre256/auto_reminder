@@ -5,6 +5,10 @@ from models import Student
 
 
 class Emailer:
+    """
+    Emails students about their missing assignments. It is a simple wrapper
+    around an aiosmtplib.SMTP object that provides templating and async sending
+    """
     config: dict
     smtp: SMTP
 
@@ -29,6 +33,13 @@ class Emailer:
 
 
     def compose(self, template: Template, student: Student) -> EmailMessage:
+        """
+        Creates an email message from the given template and student information
+
+        :param template: The email message template to use
+        :param student: The student to send the email to
+        :return: The formatted email message
+        """
         msg = EmailMessage()
         msg["Subject"] = self.config["subject"]
         msg["To"] = student.email if not bool(self.config["test"]) else self.config["email_address"]
@@ -39,5 +50,11 @@ class Emailer:
 
 
     async def send(self, template: Template, student: Student):
+        """
+        Composes and sends an email to a student about their missing assignments
+
+        :param template: The email message template to use
+        :param student: The student to send the email to
+        """
         msg = self.compose(template, student)
         await self.smtp.send_message(msg)

@@ -5,6 +5,10 @@ from functools import partial
 from moodle import Moodle
 
 class ApiFinder(StudentFinder):
+    """
+    Implementation of StudentFinder that uses the Moodle API
+    to get students
+    """
     courseid: int
     roleid: int
     api: Moodle
