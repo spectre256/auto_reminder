@@ -34,7 +34,7 @@
         src = ./.;
         format = "pyproject";
         preBuild = "cp ${pyproject} pyproject.toml";
-        buildInputs = [ setuptools requests moodlepy ];
+        buildInputs = [ setuptools requests moodlepy aiosmtplib ];
       };
 
       formatter.${system} = pkgs.nixpkgs-fmt;
@@ -44,6 +44,7 @@
           (pkgs.python3.withPackages (py-pkgs: with py-pkgs; [
             requests
             moodlepy
+            aiosmtplib
             jedi-language-server
           ]))
         ];

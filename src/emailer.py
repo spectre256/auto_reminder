@@ -1,19 +1,32 @@
-from smtplib import SMTP_SSL
+from aiosmtplib import SMTP
 from email.message import EmailMessage
 from string import Template
 from models import Student
 
+
 class Emailer:
     config: dict
-    smtp: SMTP_SSL
+    smtp: SMTP
 
     def __init__(self, config):
         self.config = config
-        self.smtp = SMTP_SSL(config["email_host"], int(config["email_port"]))
-        self.smtp.login(config["email_address"], config["email_password"])
+        self.smtp = SMTP()
 
-    def __del__(self):
-        self.smtp.quit()
+    async def __aenter__(self):
+        await self.smtp.connect(
+            hostname=self.config["email_host"],
+            port=int(self.config["email_port"]),
+            username=self.config["email_address"],
+            password=self.config["email_password"],
+            use_tls=True,
+        )
+
+        return self
+
+
+    async def __aexit__(self, *_):
+        await self.smtp.quit()
+
 
     def compose(self, template: Template, student: Student) -> EmailMessage:
         msg = EmailMessage()
@@ -24,6 +37,7 @@ class Emailer:
         msg.set_content(template.substitute(name=student.name, missing=missing))
         return msg
 
-    def send(self, template: Template, student: Student):
+
+    async def send(self, template: Template, student: Student):
         msg = self.compose(template, student)
-        self.smtp.send_message(msg)
+        await self.smtp.send_message(msg)

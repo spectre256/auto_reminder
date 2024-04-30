@@ -7,6 +7,7 @@ import json
 import sys
 import os
 from string import Template
+import asyncio
 
 
 class App:
@@ -17,25 +18,20 @@ class App:
     def __init__(self):
         args = App.parse_args(sys.argv[1:]) # The [1:] skips the first argument which is the filename
 
-        if args["config"]:
-            self.config = json.load(args["config"])
-        else:
-            self.config = os.environ
+        self.config = json.load(args["config"]) if args["config"] else os.environ
 
-        if args["api"]:
-            self.student_finder = ApiFinder(self.config)
-        elif args["manual"]:
-            self.student_finder = ManualFinder(self.config, args["manual"])
+        self.student_finder = (ApiFinder(self.config) if args["api"]
+                               else ManualFinder(self.config, args["manual"]))
 
-        self.emailer = Emailer(self.config)
 
-    def run(self):
+    async def run(self):
         students = self.student_finder.get_missing()
-        # print(list(students))
         template = Template(self.config["template"])
-        # print(self.emailer.compose(template, next(students)))
-        for student in students:
-            self.emailer.send(template, student)
+
+        async with Emailer(self.config) as emailer, asyncio.TaskGroup() as tg:
+            for student in students:
+                tg.create_task(emailer.send(template, student))
+
 
     def parse_args(args: list[str]) -> dict:
         parser = argparse.ArgumentParser(prog="Auto Reminder")
@@ -50,7 +46,7 @@ class App:
 
 
 def main():
-    App().run()
+    asyncio.run(App().run())
 
 if __name__ == "__main__":
     main()
