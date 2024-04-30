@@ -1,0 +1,14 @@
+{
+    "course_id": 2,
+    "role_id": 0,
+    "url": "https://sandbox.moodledemo.net/webservice/rest/server.php",
+    "token": "",
+    "threshold": 3,
+    "test": true,
+    "email_host": "smtp.gmail.com",
+    "email_port": 465,
+    "email_address": "EMAIL",
+    "email_password": "PASSWORD",
+    "subject": "CSSE220 Missing Assignments",
+    "template": "Hello $name,\n\nIn CSSE220, you are missing the following assignments:\n$missing\n\nPlease submit these by the due date. Note that you may be receiving this email if the assignments have not been graded yet.\n\nThanks,\nEllis Gibbons"
+}
