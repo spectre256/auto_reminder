@@ -31,10 +31,11 @@ class App:
 
     def run(self):
         students = self.student_finder.get_missing()
-        print(list(students))
-        # template = Template(self.config["template"])
-        # for student in students:
-        #     self.emailer.send(template, student)
+        # print(list(students))
+        template = Template(self.config["template"])
+        # print(self.emailer.compose(template, next(students)))
+        for student in students:
+            self.emailer.send(template, student)
 
     def parse_args(args: list[str]) -> dict:
         parser = argparse.ArgumentParser(prog="Auto Reminder")

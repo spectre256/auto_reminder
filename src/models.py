@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from datetime import datetime, timedelta
 from typing import Callable
 
+
 @dataclass(slots=True, frozen=True)
 class Quiz:
     id: int | None
@@ -56,6 +57,7 @@ class Student:
         missing = [quiz for quiz in quizzes() if student[quiz.name] == "-"]
         return cls(id, name, email, missing)
 
+
 class StudentFinder(ABC):
     config: dict
     threshold: timedelta
@@ -77,6 +79,7 @@ class StudentFinder(ABC):
     def is_missing(self, student: Student, quiz: Quiz) -> bool:
         pass
 
+    @abstractmethod
     def get_missing(self) -> Iterable[Student]:
         students = self.get_students()
         quizzes = self.get_quizzes()
