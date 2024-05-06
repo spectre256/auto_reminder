@@ -1,7 +1,7 @@
+from auto_reminder.models import Student
 from aiosmtplib import SMTP
 from email.message import EmailMessage
 from string import Template
-from models import Student
 
 
 class Emailer:

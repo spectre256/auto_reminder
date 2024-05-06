@@ -124,7 +124,6 @@ class StudentFinder(ABC):
         """
         pass
 
-    @abstractmethod
     def get_missing(self) -> Iterable[Student]:
         """
         Gets all students with missing assignments

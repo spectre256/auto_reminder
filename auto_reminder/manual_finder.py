@@ -1,4 +1,4 @@
-from models import StudentFinder, Student, Quiz
+from auto_reminder.models import StudentFinder, Student, Quiz
 from collections.abc import Iterable
 from functools import partial
 import csv

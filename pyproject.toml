@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto_reminder"
+version = "0.0.1"
+dependencies = [
+    "moodlepy",
+    "aiosmtplib",
+]
+
+[project.scripts]
+auto_reminder = "auto_reminder.main:main"

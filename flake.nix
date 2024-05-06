@@ -8,7 +8,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       moodlepy = with pkgs.python311Packages;
-        (buildPythonPackage rec {
+        buildPythonPackage rec {
           pname = "moodlepy";
           version = "v0.24.0";
           src = pkgs.fetchFromGitHub {
@@ -18,24 +18,18 @@
             sha256 = "sha256-eUUAQu0//ILnplbp5zq/a63o7ibsK7gBzdJCgdxeBz8=";
           };
           doCheck = false;
-        });
-    in {
-      packages.${system}.default = let
-        name = "auto_reminder";
-        version = "0.1.0";
-        pyproject = (pkgs.formats.toml { }).generate "pyproject.toml" {
-          project = {
-            inherit name version;
-            readme = "README.md";
-          };
+          propagatedBuildInputs = [ attrs cattrs requests ujson ];
         };
-      in with pkgs.python311Packages; buildPythonPackage {
-        inherit name version;
-        src = ./.;
-        format = "pyproject";
-        preBuild = "cp ${pyproject} pyproject.toml";
-        buildInputs = [ setuptools requests moodlepy aiosmtplib ];
-      };
+    in {
+      packages.${system}.default = with pkgs.python311Packages;
+        buildPythonApplication {
+          name = "auto_reminder";
+          version = "0.0.1";
+          src = ./.;
+          format = "pyproject";
+          buildInputs = [ setuptools ];
+          propagatedBuildInputs = [ moodlepy aiosmtplib ];
+        };
 
       formatter.${system} = pkgs.nixpkgs-fmt;
 

@@ -1,7 +1,7 @@
-from models import StudentFinder
-from api_finder import ApiFinder
-from manual_finder import ManualFinder
-from emailer import Emailer
+from auto_reminder.models import StudentFinder
+from auto_reminder.api_finder import ApiFinder
+from auto_reminder.manual_finder import ManualFinder
+from auto_reminder.emailer import Emailer
 import argparse
 import json
 import sys
