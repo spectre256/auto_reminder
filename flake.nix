@@ -20,8 +20,7 @@
           doCheck = false;
           propagatedBuildInputs = [ attrs cattrs requests ujson ];
         };
-    in {
-      packages.${system}.default = with pkgs.python311Packages;
+      auto_reminder = with pkgs.python311Packages;
         buildPythonApplication {
           name = "auto_reminder";
           version = "0.0.1";
@@ -30,17 +29,36 @@
           buildInputs = [ setuptools ];
           propagatedBuildInputs = [ moodlepy aiosmtplib ];
         };
+    in {
+      packages.${system} = {
+        default = auto_reminder;
+
+        docker = let
+          crontab = pkgs.writeTextDir "/etc/crontab" (builtins.readFile ./crontab);
+        in pkgs.dockerTools.buildImage {
+          name = "auto_reminder";
+          tag = "latest";
+          copyToRoot = pkgs.buildEnv {
+            name = "root";
+            paths = [ auto_reminder crontab ];
+            pathsToLink = [ "/bin" "/etc" ];
+          };
+          config.Cmd = "${pkgs.cron}/bin/cron && tail -f /var/log/cron.log";
+        };
+      };
 
       formatter.${system} = pkgs.nixpkgs-fmt;
 
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
-          (pkgs.python3.withPackages (py-pkgs: with py-pkgs; [
+        buildInputs = with pkgs; [
+          (python3.withPackages (py-pkgs: with py-pkgs; [
             requests
             moodlepy
             aiosmtplib
             jedi-language-server
           ]))
+          podman
+          cron
         ];
       };
     };
