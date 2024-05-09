@@ -1,1 +1,1 @@
-0 12 * * 0,5 /bin/auto_reminder -a
+0 12 * * fri,sun /bin/auto_reminder --api --config /etc/auto_reminder/config.json

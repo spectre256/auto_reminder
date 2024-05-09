@@ -40,10 +40,10 @@
           tag = "latest";
           copyToRoot = pkgs.buildEnv {
             name = "root";
-            paths = [ auto_reminder crontab ];
+            paths = [ auto_reminder crontab pkgs.supercronic ];
             pathsToLink = [ "/bin" "/etc" ];
           };
-          config.Cmd = "${pkgs.cron}/bin/cron && tail -f /var/log/cron.log";
+          config.Cmd = [ "/bin/supercronic" "/etc/crontab" ];
         };
       };
 
@@ -57,8 +57,7 @@
             aiosmtplib
             jedi-language-server
           ]))
-          podman
-          cron
+          supercronic
         ];
       };
     };

@@ -3,7 +3,7 @@ from json import dump
 from datetime import datetime, timedelta
 
 # url = "https://sandbox.moodledemo.net/webservice/rest/server.php"
-url = "https://moodle.rose-hulman.edu/webserver/rest/server.php"
+url = "https://moodle.rose-hulman.edu/webservice/rest/server.php"
 token = "SECRET TOKEN GOES HERE"
 courseid = 106360
 # student_roleid = 5
