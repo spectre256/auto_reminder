@@ -23,11 +23,14 @@ class ApiFinder(StudentFinder):
     def get_quizzes(self) -> Iterable[Quiz]:
         quizzes = self.api("mod_quiz_get_quizzes_by_courses", courseids=[self.courseid])["quizzes"]
         quizzes = map(Quiz.from_api, quizzes)
+        print(list(quizzes))
+        print()
         return filter(partial(Quiz.due_before, time=self.threshold), quizzes)
 
     def get_students(self) -> Iterable[Student]:
         users = self.api("core_enrol_get_enrolled_users", courseid=self.courseid)
         students = filter(lambda user: any((role["roleid"] == self.roleid for role in user["roles"])), users)
+        print(list(map(student.from_api, students)))
         return map(Student.from_api, students)
 
     def is_missing(self, student: Student, quiz: Quiz) -> bool:

@@ -4,6 +4,8 @@ from email.message import EmailMessage
 from string import Template
 
 
+# TODO: This would work better with several SMTP connections
+# Since SMTP is a sequential protocol, using async won't speed it up
 class Emailer:
     """
     Emails students about their missing assignments. It is a simple wrapper
@@ -58,3 +60,4 @@ class Emailer:
         """
         msg = self.compose(template, student)
         await self.smtp.send_message(msg)
+        print("Sent email to student " + student.name)
