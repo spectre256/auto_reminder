@@ -2,8 +2,10 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from typing import Callable
 
+TZ = ZoneInfo("America/Indiana/Indianapolis")
 
 @dataclass(slots=True, frozen=True)
 class Quiz:
@@ -28,7 +30,7 @@ class Quiz:
         """
         id = quiz["id"]
         name = quiz["name"]
-        due_date = datetime.utcfromtimestamp(quiz["timeclose"]) if quiz["timeclose"] != 0 else None
+        due_date = datetime.fromtimestamp(quiz["timeclose"], tz=TZ) if quiz["timeclose"] != 0 else None
         return cls(id, name, due_date)
 
     @classmethod
@@ -47,8 +49,9 @@ class Quiz:
         """
         if self.due_date is None:
             return True # If we don't know the due date, don't filter it out
-        epoch = datetime.utcfromtimestamp(0)
-        return self.due_date != epoch and self.due_date < datetime.utcnow() + time and self.due_date >= datetime.utcnow()
+        epoch = datetime.fromtimestamp(0, tz=TZ)
+        now = datetime.now(tz=TZ)
+        return self.due_date != epoch and self.due_date < now + time and self.due_date >= now
 
 
 @dataclass(slots=True)

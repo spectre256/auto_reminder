@@ -1,4 +1,6 @@
 __pycache__/
+result
+build/
+*.egg-info/
 config.json
 *.csv
-result
