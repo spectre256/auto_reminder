@@ -99,7 +99,7 @@ class StudentFinder(ABC):
         self.threshold = timedelta(days=int(config["threshold"]))
 
     @abstractmethod
-    def get_quizzes(self) -> Iterable[Quiz]:
+    def get_quizzes(self) -> list[Quiz]:
         """
         Gets all quizzes in a course
 
@@ -108,7 +108,7 @@ class StudentFinder(ABC):
         pass
 
     @abstractmethod
-    def get_students(self) -> Iterable[Student]:
+    def get_students(self) -> list[Student]:
         """
         Gets all students within a course
 
@@ -142,4 +142,4 @@ class StudentFinder(ABC):
                 if self.is_missing(student, quiz):
                     student.missing.append(quiz)
 
-        return students
+        return filter(lambda student: len(student.missing) > 0, students)

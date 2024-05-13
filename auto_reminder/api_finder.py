@@ -20,19 +20,18 @@ class ApiFinder(StudentFinder):
         self.roleid = config["role_id"]
         self.api = Moodle(config["url"], config["token"])
 
-    def get_quizzes(self) -> Iterable[Quiz]:
+    def get_quizzes(self) -> list[Quiz]:
         quizzes = self.api("mod_quiz_get_quizzes_by_courses", courseids=[self.courseid])["quizzes"]
         quizzes = map(Quiz.from_api, quizzes)
-        print(list(quizzes))
-        print()
-        return filter(partial(Quiz.due_before, time=self.threshold), quizzes)
+        quizzes = filter(partial(Quiz.due_before, time=self.threshold), quizzes)
+        return list(quizzes)
 
-    def get_students(self) -> Iterable[Student]:
+    def get_students(self) -> list[Student]:
         users = self.api("core_enrol_get_enrolled_users", courseid=self.courseid)
         students = filter(lambda user: any((role["roleid"] == self.roleid for role in user["roles"])), users)
-        print(list(map(student.from_api, students)))
-        return map(Student.from_api, students)
+        students = map(Student.from_api, students)
+        return list(students)
 
     def is_missing(self, student: Student, quiz: Quiz) -> bool:
         result = self.api("mod_quiz_get_user_best_grade", userid=student.id, quizid=quiz.id)
-        return result["hasgrade"] # TODO: Threshold for grade?
+        return not result["hasgrade"] # TODO: Threshold for grade?

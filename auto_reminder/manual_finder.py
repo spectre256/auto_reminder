@@ -14,12 +14,14 @@ class ManualFinder(StudentFinder):
         super().__init__(config)
         self.reader = csv.DictReader(file)
 
-    def get_quizzes(self) -> Iterable[Quiz]:
+    def get_quizzes(self) -> list[Quiz]:
         quizzes = filter(lambda field: field.startswith("Quiz:"), self.reader.fieldnames)
-        return map(Quiz.from_file, quizzes)
+        quizzes = map(Quiz.from_file, quizzes)
+        return list(quizzes)
 
-    def get_students(self) -> Iterable[Student]:
-        return map(partial(Student.from_file, quizzes=self.get_quizzes), self.reader)
+    def get_students(self) -> list[Student]:
+        students = map(partial(Student.from_file, quizzes=self.get_quizzes), self.reader)
+        return list(students)
 
     def is_missing(self, student: Student, quiz: Quiz) -> bool:
         return quiz in student.missing
