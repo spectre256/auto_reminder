@@ -135,11 +135,14 @@ class StudentFinder(ABC):
         """
         # This is just a default implementation; it won't fit all use cases
         students = self.get_students()
+        print(students)
         quizzes = self.get_quizzes()
+        print(quizzes)
 
         for student in students:
             for quiz in quizzes:
                 if self.is_missing(student, quiz):
+                    print(f"Student '{student.name}' is missing quiz '{quiz}'")
                     student.missing.append(quiz)
 
         return filter(lambda student: len(student.missing) > 0, students)
