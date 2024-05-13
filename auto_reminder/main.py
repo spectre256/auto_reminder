@@ -16,19 +16,22 @@ class App:
 
     def __init__(self):
         args = App.parse_args(sys.argv[1:]) # The [1:] skips the first argument which is the filename
-
+        print("Parsed args")
         self.config = json.load(args["config"]) if args["config"] else os.environ
-
+        print("Loaded config")
         self.student_finder = (ApiFinder(self.config) if args["api"]
                                else ManualFinder(self.config, args["manual"]))
 
 
     async def run(self):
-        students = self.student_finder.get_missing()
+        students = list(self.student_finder.get_missing())
+        print("Students with missing assignments:")
+        print(students)
         template = Template(self.config["template"])
 
         async with Emailer(self.config) as emailer, asyncio.TaskGroup() as tg:
             for student in students:
+                print(f"Created email task for student '{student.name}'")
                 tg.create_task(emailer.send(template, student))
 
 
