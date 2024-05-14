@@ -8,6 +8,13 @@ import sys
 import os
 from string import Template
 import asyncio
+import logging
+import logging.config
+
+
+logger = logging.getLogger("auto_reminder")
+with open("logging.json") as log_config:
+    logging.config.dictConfig(json.load(log_config))
 
 
 class App:
@@ -16,23 +23,23 @@ class App:
 
     def __init__(self):
         args = App.parse_args(sys.argv[1:]) # The [1:] skips the first argument which is the filename
-        print("Parsed args")
+        logger.info("Parsed args")
         self.config = json.load(args["config"]) if args["config"] else os.environ
-        print("Loaded config")
+        logger.info("Loaded config")
         self.student_finder = (ApiFinder(self.config) if args["api"]
                                else ManualFinder(self.config, args["manual"]))
 
 
     async def run(self):
         students = list(self.student_finder.get_missing())
-        print("Students with missing assignments:")
-        print(students)
+        logger.info("Found students with missing assignments")
+        logger.debug("Students with missing assignments: %s", students)
         template = Template(self.config["template"])
 
         async with Emailer(self.config) as emailer, asyncio.TaskGroup() as tg:
             for student in students:
-                print(f"Created email task for student '{student.name}'")
                 tg.create_task(emailer.send(template, student))
+                logger.debug(f"Created email task for student '{student.name}'")
 
 
     def parse_args(args: list[str]) -> dict:

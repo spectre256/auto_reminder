@@ -2,7 +2,9 @@ from auto_reminder.models import Student
 from aiosmtplib import SMTP
 from email.message import EmailMessage
 from string import Template
+import logging
 
+logger = logging.getLogger("auto_reminder")
 
 # TODO: This would work better with several SMTP connections
 # Since SMTP is a sequential protocol, using async won't speed it up
@@ -60,4 +62,4 @@ class Emailer:
         """
         msg = self.compose(template, student)
         await self.smtp.send_message(msg)
-        print("Sent email to student " + student.name)
+        logger.info(f"Sent email to student '{student.name}'")

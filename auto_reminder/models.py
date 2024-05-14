@@ -4,8 +4,10 @@ from collections.abc import Iterable
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Callable
+import logging
 
 TZ = ZoneInfo("America/Indiana/Indianapolis")
+logger = logging.getLogger("auto_reminder")
 
 @dataclass(slots=True, frozen=True)
 class Quiz:
@@ -127,7 +129,7 @@ class StudentFinder(ABC):
         """
         pass
 
-    def get_missing(self) -> Iterable[Student]:
+    def get_missing(self) -> list[Student]:
         """
         Gets all students with missing assignments
 
@@ -135,14 +137,16 @@ class StudentFinder(ABC):
         """
         # This is just a default implementation; it won't fit all use cases
         students = self.get_students()
-        print(students)
         quizzes = self.get_quizzes()
-        print(quizzes)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(students)
+            logger.debug(quizzes)
 
         for student in students:
             for quiz in quizzes:
                 if self.is_missing(student, quiz):
-                    print(f"Student '{student.name}' is missing quiz '{quiz}'")
+                    logger.debug(f"Student '{student.name}' is missing quiz '{quiz}'")
                     student.missing.append(quiz)
 
-        return filter(lambda student: len(student.missing) > 0, students)
+        filtered = filter(lambda student: len(student.missing) > 0, students)
+        return list(filtered)
