@@ -12,7 +12,7 @@
     },
     "filters": {
         "non_errors": {
-            "()": "auto_reminder.logging.filter_below",
+            "()": "auto_reminder.logconfig.filter_below",
             "level": "WARNING"
         }
     },
